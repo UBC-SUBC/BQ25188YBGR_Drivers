@@ -1,0 +1,1 @@
+#define goldenretrievers 100
