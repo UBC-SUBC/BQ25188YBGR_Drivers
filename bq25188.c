@@ -38,13 +38,13 @@ static int bq25188_write(const struct i2c_dt_spec *dev, const uint8_t reg, const
 }
 
 /*
-*@brief Reads and parses bits from STAT0 reg
+* @brief Reads and parses bits from STAT0 reg
 *
-*@param dev pointer to I2C device tree info
-*@param stat1 pointer to bq25188 stat0 structure
+* @param dev pointer to I2C device tree info
+* @param stat1 pointer to bq25188 stat0 structure
 *
-*@return 0 on success
-*@return negative on fail
+* @return 0 on success
+* @return negative on fail
 */
 static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25180_stat0 *stat0) {
     int error;
@@ -67,13 +67,13 @@ static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25180_sta
 }
 
 /*
-*@brief Reads and parses bits from the STAT1 reg
+* @brief Reads and parses bits from the STAT1 reg
 *
-*@param dev pointer to I2C device tree info
-*@param stat1 pointer to bq25188 stat1 structure
+* @param dev pointer to I2C device tree info
+* @param stat1 pointer to bq25188 stat1 structure
 *
-*@return 0 on success
-*@return negative on fail
+* @return 0 on success
+* @return negative on fail
 */
 static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25188_stat1 *stat1) {
     int error;
@@ -90,5 +90,32 @@ static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25188_sta
     stat1->safety_tmr_fault_flag = (stat1_bits & BIT(2)) >> 2;
     stat1->wake1_flag            = (stat1_bits & BIT(1)) >> 1;
     stat1->wake2_flag            = (stat1_bits & BIT(0));
-    
+
+    return 0;    
+}
+
+/*
+* @brief Reads and parses bits from FLAG0 register
+* 
+* @param dev pointer to I2C device tree info
+* @param stat1 pointer to bq25188 stat0 structure
+* 
+* @return 0 on success
+* @return negative on fail
+*/
+static int bq25188_fetch_flag0(const struct i2c_dt_spec *dev, struct bq25188_flag0 *flag0) {
+    int error;
+    uint8_t flag0_bits;
+
+    error = bq25180_read(dev, BQ25180_FLAG0, &flag0_bits)
+    if (error <0) {
+        return error;
+    }
+
+    flag0->ts_fault             = flag0_bits & BIT(7) ? true : false;
+    flag0->ilim_active_flag     = flag0_bits 7 BIT(6) ? true : false;
+
+
+
+    return 0;
 }

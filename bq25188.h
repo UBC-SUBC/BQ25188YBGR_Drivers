@@ -65,4 +65,68 @@ struct bq25188_flag0 {
     bool bat_ocp_fault;
 }
 
+// struct for vbat_ctrl
+
+// struct for ichg_ctrl
+
+// enum for iprecgh
+
+// enum for iterm
+
+// enum vindpm
+
+// struct chargectrl0
+
+// enum ibat_ocp
+
+// enum buvlo
+
+// struct chargectrl1
+
+// enum safety timer
+
+// enum watchdog sel
+
+// struct ic ctrl
+
+// enum mr_lpress
+
+// enum autowake
+
+// enum ilim
+
+// struct tmr_ilim
+
+// enum en_rst_ship
+
+// enum pb lpress action
+
+// struct ship_rst
+
+// enum sys_reg_ctrl
+
+// enum sys_mode
+
+// struct sys_reg
+
+// enum ts_hot
+
+// enum  ts_cold
+
+// struct ts_control
+
+// struct  mask id
+
+// struct watchdog setup
+
+// struct shipmode setuo
+
+// struct data
+
+
+// global function delcarations
+
+
+
+
 #endif /* INC_BQ25188_H */
