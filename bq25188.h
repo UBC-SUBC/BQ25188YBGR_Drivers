@@ -65,17 +65,41 @@ struct bq25188_flag0 {
     bool bat_ocp_fault;
 }
 
-// struct for vbat_ctrl
+struct bq25188_vbat_ctrl {
+    uint8_t pg mode;  // reserved
+    uint8_t vbatreg;
+};
 
-// struct for ichg_ctrl
+struct bq25188_ichg_ctrl {
+    uint8_t chg_dis;
+    uint8_t icg
+};
 
-// enum for iprecgh
+enum bq25188_iprechg {
+    BQ25188_IPRECHG_2x = 0x00,
+    BQ25188_IPRECHG_1x = 0x01,
+};
 
-// enum for iterm
+enum bq25188_iterm {
+    BQ25188_ITERM_DISABLE = 0x00, 
+    BQ25188_ITERM_5       = 0x01,
+    BQ25188_ITERM_10      = 0x10,
+    BQ25188_ITERM_20      = 0x11,
+};
 
-// enum vindpm
+enum bq25188_vindpm {
+    BQ25188_VINDPM_4_2     = 0x00,
+    BQ25188_VINDPM_4_5     = 0x01,
+    BQ25188_VINDPM_4_7     = 0x10,
+    BQ25188_VINDPM_DISABLE = 0x11,
+};
 
-// struct chargectrl0
+struct bq25180_chargectrl0 {
+    enum bq25188_iprechg iprechg;
+    enum bq25188_iterm iterm;
+    enum bq25188_vindpm vindpm;
+    uint8_t therm_reg;
+}
 
 // enum ibat_ocp
 
