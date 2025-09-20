@@ -142,6 +142,32 @@ static int bq25188_fetch_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188
     if (error < 0) {
         return error;
     }
-
-    vbat_ctrl->pg_mode = 
+    // finish later
+    // vbat_ctrl->pg_mode = 
+    return 0;
 } 
+
+static int bq25188_fetch_ichg_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ichg_ctrl *ichg_ctrl) {
+    int error;
+    uint8_t ichg_ctrl_bits;
+    error = bq25188_read(dev, BQ25188_ICHG_CTRL, &ichg_ctrl_bits);
+    if (error < 0) {
+        return error;
+    }
+    
+    ichg_ctrl->chg_dis = (ichg_ctrl_bits & BIT(7)) >> 7;
+    ichg_ctrl->ichg = (ichg_ctrl_bits & (~BIT(7)));
+
+    return 0;
+}
+
+static int bq25188_set_ichg_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ichg *ichg_ctrl) {
+    int error;
+    uint8_t ichg_ctrl_bits = 0;
+
+    ichg_ctrl_bits |= (ichg_ctrl-> chg_dis << 6;)
+    ichg_ctrl_bits |= ichg_ctrl-> ichg;
+
+    return bq25188_write(dev, BQ25188_ICHG_CTRL, ichg_ctrl_bits);
+}
+

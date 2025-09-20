@@ -22,10 +22,10 @@
 #define BQ25188_MASK_ID     0x0C // MASK and Device ID
 
 enum bq25188_chg_stat {
-    BQ25188_CHG_NOT_CHARGING     = 0b00,
-    BQ25188_CHG_CONSTANT_CURRENT = 0b01,
-    BQ25188_CHG_CONSTANT_VOLTAGE = 0b10,
-    BQ25188_CHG_CHARGE_DONE      = 0b11,
+    BQ25188_CHG_NOT_CHARGING     = 0x00,
+    BQ25188_CHG_CONSTANT_CURRENT = 0x01,
+    BQ25188_CHG_CONSTANT_VOLTAGE = 0x02,
+    BQ25188_CHG_CHARGE_DONE      = 0x03,
 };
 
 struct bq25188_stat0 {
@@ -39,10 +39,10 @@ struct bq25188_stat0 {
 };
 
 enum bq25188_ts_stat {
-    BQ25188_TS_NORMAL                   = 0b00      
-    BQ25188_TS_CHARGING_SUSPENDED       = 0b01,
-    BQ25188_TS_CHARGING_CURRENT_REDUCED = 0b10,
-    BQ25188_TS_CHARGING_VOLTAGE_REDUCED = 0b11,
+    BQ25188_TS_NORMAL                   = 0x00      
+    BQ25188_TS_CHARGING_SUSPENDED       = 0x01,
+    BQ25188_TS_CHARGING_CURRENT_REDUCED = 0x02,
+    BQ25188_TS_CHARGING_VOLTAGE_REDUCED = 0x03,
 };
 
 struct bq25188_stat1 {
@@ -72,7 +72,7 @@ struct bq25188_vbat_ctrl {
 
 struct bq25188_ichg_ctrl {
     uint8_t chg_dis;
-    uint8_t icg
+    uint8_t ichg
 };
 
 enum bq25188_iprechg {
@@ -83,15 +83,15 @@ enum bq25188_iprechg {
 enum bq25188_iterm {
     BQ25188_ITERM_DISABLE = 0x00, 
     BQ25188_ITERM_5       = 0x01,
-    BQ25188_ITERM_10      = 0x10,
-    BQ25188_ITERM_20      = 0x11,
+    BQ25188_ITERM_10      = 0x02,
+    BQ25188_ITERM_20      = 0x03,
 };
 
 enum bq25188_vindpm {
     BQ25188_VINDPM_4_2     = 0x00,
     BQ25188_VINDPM_4_5     = 0x01,
-    BQ25188_VINDPM_4_7     = 0x10,
-    BQ25188_VINDPM_DISABLE = 0x11,
+    BQ25188_VINDPM_4_7     = 0x02,
+    BQ25188_VINDPM_DISABLE = 0x03,
 };
 
 struct bq25180_chargectrl0 {
@@ -101,45 +101,170 @@ struct bq25180_chargectrl0 {
     uint8_t therm_reg;
 }
 
-// enum ibat_ocp
+enum bq25188_ibat_ocp {
+    BQ25188_IBAT_OCP_500mA  = 0x00,
+    BQ25188_IBAT_OCP_1000mA = 0x01,
+    BQ25188_IBAT_OCP_1500mA = 0x02,
+    BQ25188_IBAT_OCP_3000mA = 0x03,
+};
 
-// enum buvlo
+enum bq25180_buvlo {
+    BQ25180_BUVLO_3_0V_A = 0x00,
+    BQ25180_BUVLO_3_0V_B = 0x01,
+    BQ25180_BUVLO_3_0V   = 0x02,
+    BQ25180_BUVLO_2_8V   = 0x03,
+    BQ25180_BUVLO_2_6V   = 0x04,
+    BQ25180_BUVLO_2_4V   = 0x05,
+    BQ25180_BUVLO_2_2V   = 0x06,
+    BQ25180_BUVLO_2_0V   = 0x07,
+};
 
-// struct chargectrl1
 
-// enum safety timer
+struct bq25188_chargectrl1 {
+    enum bq25188_ibat_ocp ibat_ocp;
+    enum bq25188_buvlo buvlo;
+    uint8_t chg_status_int_mask;
+    uint8_t ilim_int_mask;
+    uint8_t vindpm_int_mask;
+};
 
-// enum watchdog sel
+enum bq25188_safety_timer {
+    BQ25188_SAFETY_TIMER_3_HR    = 0x00,
+    BQ25188_SAFETY_TIMER_6_HR    = 0x01,
+    BQ25188_SAFETY_TIMER_12_HR   = 0x02,
+    BQ25188_SAFETY_TIMER_DISABLE = 0x03,
+};
 
-// struct ic ctrl
+enum bq25188_watchdog_sel {
+    BQ25188_WD_SEL_160s_DEFAULT  = 0x00,
+    BQ25188_WD_SEL_160s_HW_RESET = 0x01,
+    BQ25188_WD_SEL_40S_HW_RESET  = 0x02,
+    BQ25188_WD_SEL_DISABLE       = 0x03,
+};
 
-// enum mr_lpress
+struct bq25188_ic_ctrl {
+    uint8_t ts_en;
+    uint8_t vlowv_sel;
+    uint8_t vrch_0;
+    uint8_t tmr_en_2x;
+    enum bq25188_safety_timer safety_timer;
+    enum bq25188_watchdog_sel watchdog_sel;
+}
 
-// enum autowake
+enum bq25188_mr_lpress {
+    BQ25188_MR_LPRESS_5s  = 0X00,
+    BQ25188_MR_LPRESS_10s = 0x01,
+    BQ25188_MR_LPRESS_15s = 0x02,
+    BQ25188_MR_LPRESS_20s = 0x03,
+};
 
-// enum ilim
+enum bq25188_autowake {
+    BQ25188_AUTOWAKE_0_5s = 0x00,
+    BQ25188_AUTOWAKE_1s   = 0x01,
+    BQ25188_AUTOWAKE_2s   = 0x02,
+    BQ25188_AUT0WAKE_4s   = 0x03,
+};
 
-// struct tmr_ilim
+enum bq25188_ilim {
+    BQ25188_ILIM_50mA   = 0x00,
+    BQ25188_ILIM_100mA  = 0x01,
+    BQ25188_ILIM_200mA  = 0x02,
+    BQ25188_ILIM_300mA  = 0x03,
+    BQ25188_ILIM_400mA  = 0x04,
+    BQ25188_ILIM_500mA  = 0x05,
+    BQ25188_ILIM_665mA  = 0x06,
+    BQ25188_ILIM_1050mA = 0X07,
+}; 
 
-// enum en_rst_ship
+struct bq25188_tmr_ilim {
+    enum bq25188_mr_lpress mr_lpress;
+    uint8_t mr_reset_vin;
+    enum bq25188_autowake autowake;
+    enum bq25188_ilim ilim;
+}
 
-// enum pb lpress action
+enum bq25188_en_rst_ship {
+    BQ25188_EN_RST_SHIP_DO_NTHNG       = 0x00,
+    BQ25188_EN_RST_SHIP_EN_SHTDWN_MODE = 0x01,
+    BQ25188_EN_RST_SHIP_EN_SHIP_MODE   = 0X02,
+    BQ25188_EN_RST_SHIP_HW_RST         = 0x03,
+};
 
-// struct ship_rst
+enum bq25188_pb_lpress_action {
+    BQ25188_PB_LPRESS_DO_NTHNG       = 0x00,
+    BQ25188_PB_LPRESS_HW_RST         = 0x01,
+    BQ25188_PB_LPRESS_EN_SHIP_MODE   = 0x02,
+    BQ25188_PB_LPRESS_EN_SHTDWN_MODE = 0x03,
+};
 
-// enum sys_reg_ctrl
 
-// enum sys_mode
+struct bq25188_ship_rst {
+    uint8_t reg_rst;
+    enum bq25188_en_rst_ship en_rst_ship;
+    enum bq25188_pb_lpress_action pb_lpress_action;
+    uint8_t wake1_tmr;
+    uint8_t wake2_tmr;
+    uint8_t en_push;
+}
 
-// struct sys_reg
+enum bq25188_sys_reg_ctrl {
+    BQ25188_SYS_REG_CTRL_BATTERY_TRACKING = 0x00,
+    BQ25188_SYS_REG_CTRL_4_4V             = 0x01,
+    BQ25188_SYS_REG_CTRL_4_5V             = 0x02,
+    BQ25188_SYS_REG_CTRL_4_6V             = 0x03,
+    BQ25188_SYS_REG_CTRL_4_7V             = 0x04,
+    BQ25188_SYS_REG_CTRL_4_8V             = 0x05,
+    BQ25188_SYS_REG_CTRL_4_9V             = 0x06,
+    BQ25188_SYS_REG_CTRL_PASS_THROUGH     = 0x07,
+};
 
-// enum ts_hot
+enum bq25188_sys_mode {
+    BQ25188_SYS_MODE_VIN_VBAT     = 0x00, 
+    BQ25188_SYS_MODE_VBAT         = 0x01,
+    BQ25188_SYS_MODE_DIS_FLOAT    = 0x02,
+    BQ25188_SYS_MODE_DIS_PULLDOWN = 0x03,
+};
 
-// enum  ts_cold
+struct bq25188_sys_reg {
+    enum bq25188_sys_reg_ctrl sys_reg_ctrl;
+    uint8_t pg_gpo;
+    enum bq25188_sys_mode sys_mode;
+    uint8_t watchdog_15s_enable;
+    uint8_t vdppm_dis;
+};
 
-// struct ts_control
+enum bq25188_ts_hot {
+    BQ25188_TS_HOT_60C = 0x00,
+    BQ25188_TS_HOT_65C = 0x01,
+    BQ25188_TS_HOT_50C = 0x02,
+    BQ25188_TS_HOT_45C = 0x03,
+};
 
-// struct  mask id
+enum bq25188_ts_cold {
+    BQ25188_TS_COLD_0C  = 0x00,
+    BQ25188_TS_COLD_3C  = 0x01,
+    BQ25188_TS_COLD_5C  = 0x02,
+    BQ25188_TS_COLD_N3C = 0x03,
+};
+
+
+struct bq25188_ts_control {
+    enum bq25188_ts_hot ts_hot;
+    enum bq25188_ts_cold ts_cold;
+    uint8_t ts_warm;
+    uint8_t ts_cool;
+    uint8_t ts_ichg;
+    uint8_t ts_vrcg;
+};
+
+struct bq25188_msk_id {
+    uint8_t ts_int_mask;
+    uint8_t treg_int_mask;
+    uint8_t bat_int_mask;
+    uint8_t pg_int_mask;
+};
+
+/* ----- End of Internal Regs ----- */
 
 // struct watchdog setup
 
