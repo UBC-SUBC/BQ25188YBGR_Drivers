@@ -165,9 +165,55 @@ static int bq25188_set_ichg_ctrl(const struct i2c_dt_spec *dev, struct bq25188_i
     int error;
     uint8_t ichg_ctrl_bits = 0;
 
-    ichg_ctrl_bits |= (ichg_ctrl-> chg_dis << 6;)
-    ichg_ctrl_bits |= ichg_ctrl-> ichg;
+    ichg_ctrl_bits |= (ichg_ctrl->chg_dis << 6;)
+    ichg_ctrl_bits |= ichg_ctrl->ichg;
 
     return bq25188_write(dev, BQ25188_ICHG_CTRL, ichg_ctrl_bits);
 }
 
+static int bq25188_fetch_chargectrl0(const truct i2c_dt_spec *dev, struct bq25188_chargectrl0 *chargectrl0) {
+    int error;
+    uint8_t chargerctrl0_bits;
+    
+    error = bq25188_read(dev, BQ25188_CHARGECTRL0, &chargerctrl0_bits);
+    if (error < 0) {
+        return error;
+    }
+    
+    chargectrl0->iprechg   = (chargerctrl0_bits & BIT(6)) >> 6;
+    chargectrl0->iterm     = (chargerctrl0_bits & (BIT(5) | BIT(4))) >> 4;
+    chargectrl0->vindpm    = (chargerctrl0_bits & (BIT(3) | BIT(2))) >> 2;
+    chargectrl0->therm_reg = (chargerctrl0_bits & (BIT(1) | BIT(0)));
+
+    return 0;
+}
+
+static int bq25188_set_chargectrl0(const struct i2c_dt_spec *dev, struct bq25188_chargectrl0 *chargectrl0) {
+    int error;
+    uint8_t chargectrl0_bits = 0;
+
+    chargectrl0_bits |= (chargectrl0->iprechg << 6);
+    chargectrl0_bits |= (chargectrl0->iterm << 4);
+    chargectrl0_bits |= (chargectrl0->vindpm << 2);
+    chargectrl0_bits |= chargectrl0->therm_reg;
+
+    return bq25188_write(dev, BQ25188_CHARGECTRL0, chargectrl0_bits);
+}
+
+static int bq25188_fetch_chargectrl1(const struct i2c_dt_spec *dev, struct bq25188_chargectrl1 *chargectrl1) {
+    int error;
+    uint8_t chargectrl1_bits;
+
+    error = bq25188_read(dev, BQ25188_CHARGECTRL1, &chargectrl1_bits);
+    if (error < 0) {
+        return error;
+    }
+
+    chargectrl1->chargectrl1->ibat_ocp = (chargectrl1_bits & (BIT(7) | BIT(6))) >> 6;
+    chargectrl1->buvlo                 = (chargectrl1_bits & (BIT(5) | BIT(4) | BIT(3))) >> 3;
+    chargectrl1->chg_status_int_mask   = (chargectrl1_bits & (BIT(2))) >> 2;
+    chargectrl1->ilim_int_mask         = (chargectrl1_bits & (BIT(1))) >> 1;
+    chargectrl1->vindpm_int_mask       = (chargectrl1_bits & (BIT(0)));
+
+    return 0;
+}

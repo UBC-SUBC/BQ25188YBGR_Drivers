@@ -94,7 +94,7 @@ enum bq25188_vindpm {
     BQ25188_VINDPM_DISABLE = 0x03,
 };
 
-struct bq25180_chargectrl0 {
+struct bq25188_chargectrl0 {
     enum bq25188_iprechg iprechg;
     enum bq25188_iterm iterm;
     enum bq25188_vindpm vindpm;
@@ -108,15 +108,15 @@ enum bq25188_ibat_ocp {
     BQ25188_IBAT_OCP_3000mA = 0x03,
 };
 
-enum bq25180_buvlo {
-    BQ25180_BUVLO_3_0V_A = 0x00,
-    BQ25180_BUVLO_3_0V_B = 0x01,
-    BQ25180_BUVLO_3_0V   = 0x02,
-    BQ25180_BUVLO_2_8V   = 0x03,
-    BQ25180_BUVLO_2_6V   = 0x04,
-    BQ25180_BUVLO_2_4V   = 0x05,
-    BQ25180_BUVLO_2_2V   = 0x06,
-    BQ25180_BUVLO_2_0V   = 0x07,
+enum bq25188_buvlo {
+    BQ25188_BUVLO_3_0V_A = 0x00,
+    BQ25188_BUVLO_3_0V_B = 0x01,
+    BQ25188_BUVLO_3_0V   = 0x02,
+    BQ25188_BUVLO_2_8V   = 0x03,
+    BQ25188_BUVLO_2_6V   = 0x04,
+    BQ25188_BUVLO_2_4V   = 0x05,
+    BQ25188_BUVLO_2_2V   = 0x06,
+    BQ25188_BUVLO_2_0V   = 0x07,
 };
 
 
@@ -266,11 +266,6 @@ struct bq25188_msk_id {
 
 /* ----- End of Internal Regs ----- */
 
-// struct watchdog setup
-
-// struct shipmode setuo
-
-// struct data
 
 
 // global function delcarations
