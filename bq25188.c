@@ -154,7 +154,6 @@ static int bq25188_fetch_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188
 }
 
 static int bq25188_set_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188_vbat_ctrl *vbat_ctrl) {
-    int error;
     uint8_t vbat_ctrl_bits = 0;
 
     vbat_ctrl_bits |= vbat_ctrl->vbatreg;
@@ -183,10 +182,9 @@ static int bq25188_fetch_ichg_ctrl(const struct i2c_dt_spec *dev, struct bq25188
 }
 
 static int bq25188_set_ichg_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ichg *ichg_ctrl) {
-    int error;
     uint8_t ichg_ctrl_bits = 0;
 
-    ichg_ctrl_bits |= (ichg_ctrl->chg_dis << 6;)
+    ichg_ctrl_bits |= (ichg_ctrl->chg_dis << 6);
     ichg_ctrl_bits |= ichg_ctrl->ichg;
 
     return bq25188_write(dev, BQ25188_ICHG_CTRL, ichg_ctrl_bits);
@@ -210,7 +208,6 @@ static int bq25188_fetch_chargectrl0(const truct i2c_dt_spec *dev, struct bq2518
 }
 
 static int bq25188_set_chargectrl0(const struct i2c_dt_spec *dev, struct bq25188_chargectrl0 *chargectrl0) {
-    int error;
     uint8_t chargectrl0_bits = 0;
 
     chargectrl0_bits |= (chargectrl0->iprechg << 6);
@@ -240,7 +237,6 @@ static int bq25188_fetch_chargectrl1(const struct i2c_dt_spec *dev, struct bq251
 }
 
 static int bq25188_set_chargectrl1(const struct i2c_dt_spec *dev, struct bq25188_chargectrl1 *chargectrl1) {
-    int error;
     uint8_t chargectrl1_bits = 0;
 
     chargectrl1_bits |= (chargectrl1->ibat_ocp << 6);
@@ -252,11 +248,95 @@ static int bq25188_set_chargectrl1(const struct i2c_dt_spec *dev, struct bq25188
     return bq25188_write(dev, BQ25188_CHARGECTRL1, chargectrl1_bits);
 }
 
-static int bq25188_set_ic_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ic_ctrl  *ic_ctrl) {
+static int bq25188_fetch_ic_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ic_ctrl *ic_ctrl) {
     int error;
-    uint8_t chargectrl1_bits = 0;
+    uint8_t ic_ctrl_bits;
 
-    chargectrl1_bits |= (chargectrl1->ts_en
+    error = bq25188_read(dev, BQ25188_IC_CTRL, &ic_ctrl_bits);
+    if (error < 0) {
+        return error;
+    }
 
-    return bq25188_write(dev, BQ25188_CHARGECTRL1, chargectrl1_bits);
+    ic_ctrl->ts_en        = (ic_ctrl_bits & BIT(7)) >> 7;
+    ic_ctrl->vlowv_sel    = (ic_ctrl_bits & BIT(6)) >> 6;
+    ic_ctrl->vrch_0       = (ic_ctrl_bits & BIT(5)) >> 5;
+    ic_ctrl->tmr_en_2x    = (ic_ctrl_bits & BIT(4)) >> 4;
+    ic_ctrl->safety_timer = (ic_ctrl_bits & (BIT(3) | BIT(2))) >> 2;
+    ic_ctrl->watchdog_sel = (ic_ctrl_bits & (BIT(1) | BIT(0)));
+
+    return 0;
 }
+
+static int bq25188_set_ic_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ic_ctrl  *ic_ctrl) {
+    uint8_t ic_ctrl_bits = 0;
+
+    ic_ctrl_bits |= (ic_ctrl->ts_en << 7);
+    ic_ctrl_bits |= (ic_ctrl->vlowv_sel << 6);
+    ic_ctrl_bits |= (ic_ctrl->vrch_0 << 5);
+    ic_ctrl_bits |= (ic_ctrl->tmr_en_2x << 4);
+    ic_ctrl_bits |= (ic_ctrl->safety_timer << 2);
+    ic_ctrl_bits |= (ic_ctrl->watchdog_sel);
+
+    return bq25188_write(dev, BQ25188_CHA1, ic_ctrl_bits);
+}
+
+static int bq25188_fetch_tmr_ilim(const struct i2c_dt_spec *dev, struct bq25188_tmr_ilim *tmr_ilim) {
+    int error;
+    uint8_t tmr_ilim_bits;
+
+    error = bq25188_read(dev, BQ25188_TMR_ILIM, &tmr_ilim_bits);
+    if (error < 0) {
+        return error;
+    }
+
+    tmr_ilim->mr_lpress    = (tmr_ilim_bits & (BIT(7) | BIT(6))) >> 6;
+    tmr_ilim->mr_reset_vin = (tmr_ilim_bits & BIT(5)) >> 5;
+    tmr_ilim->autowake     = (tmr_ilim_bits & (BIT(4) | BIT(3))) >> 3;
+    tmr_ilim->ilim         = (tmr_ilim_bits & (BIT(2) | BIT(1) | BIT(0)));
+    
+    return 0;
+}
+
+static int bq25188_set_tmr_ilim(const struct i2c_dt_spec *dev, struct bq25188_tmr_ilim *tmr_ilim) {
+    uint8_t tmr_ilim_bits = 0;
+
+    tmr_ilim_bits |= (tmr_ilim->mr_lpress << 6);
+    tmr_ilim_bits |= (tmr_ilim->mr_reset_vin << 5);
+    tmr_ilim_bits |= (tmr_ilim->autowake << 3);
+    tmr_ilim_bits |= (tmr_ilim->ilim);
+    
+    return bq25188_write(dev, BQ25188_TMR_ILIM, tmr_ilim_bits);
+}
+
+static int bq25188_fetch_ship_rst(const struct i2c_dt_spec *dev, struct bq25188_ship_rst *ship_rst) {
+    int error;
+    uint8_t ship_rst_bits;
+
+    error = bq25188_read(dev, BQ25188_SHIP_RST, &ship_rst_bits);
+    if (error < 0) {
+        return error;
+    }
+
+    ship_rst->reg_rst          = (ship_rst_bits & BIT(7)) >> 7;
+    ship_rst->en_rst_ship      = (ship_rst_bits & (BIT(6) | BIT(5))) >> 5;
+    ship_rst->pb_lpress_action = (ship_rst_bits & (BIT(4) | BIT(3))) >> 3;
+    ship_rst->wake1_tmr        = (ship_rst_bits & BIT(2)) >> 2;
+    ship_rst->wake2_tmr        = (ship_rst_bits & BIT(1)) >> 1;
+    ship_rst->en_push          = (ship_rst_bits & BIT(0)); 
+
+    return 0;
+}
+
+static int bq25188_set_ship_rst(const struct i2c_dt_spec *dev, struct bq25188_ship_rst *ship_rst) {
+    uint8_t ship_rst_bits = 0;
+
+    ship_rst_bits |= (ship_rst->reg_rst << 7);
+    ship_rst_bits |= (ship_rst->en_rst_ship << 5);
+    ship_rst_bits |= (ship_rst->pb_lpress_action << 3);
+    ship_rst_bits |= (ship_rst->wake1_tmr << 2);
+    ship_rst_bits |= (ship_rst->wake2_tmr << 1);
+    ship_rst_bits |= (ship_rst->en_push);
+
+    return bq25188_write(dev, BQ25188_SHIP_RST, ship_rst_bits);
+}
+
