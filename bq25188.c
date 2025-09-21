@@ -238,3 +238,25 @@ static int bq25188_fetch_chargectrl1(const struct i2c_dt_spec *dev, struct bq251
 
     return 0;
 }
+
+static int bq25188_set_chargectrl1(const struct i2c_dt_spec *dev, struct bq25188_chargectrl1 *chargectrl1) {
+    int error;
+    uint8_t chargectrl1_bits = 0;
+
+    chargectrl1_bits |= (chargectrl1->ibat_ocp << 6);
+    chargectrl1_bits |= (chargectrl1->buvlo << 3);
+    chargectrl1_bits |= (chargectrl1->chg_status_int_mask << 2);
+    chargectrl1_bits |= (chargectrl1->ilim_int_mask << 1);
+    chargectrl1_bits |= chargectrl1->vindpm_int_mask;
+
+    return bq25188_write(dev, BQ25188_CHARGECTRL1, chargectrl1_bits);
+}
+
+static int bq25188_set_ic_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ic_ctrl  *ic_ctrl) {
+    int error;
+    uint8_t chargectrl1_bits = 0;
+
+    chargectrl1_bits |= (chargectrl1->ts_en
+
+    return bq25188_write(dev, BQ25188_CHARGECTRL1, chargectrl1_bits);
+}
