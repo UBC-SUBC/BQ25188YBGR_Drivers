@@ -37,6 +37,11 @@ static int bq25188_write(const struct i2c_dt_spec *dev, const uint8_t reg, const
     return i2c_reg_write_byte_dt(dev, reg, data);
 }
 
+static inline int bq25188_update_bits(const struct i2c_dt_spec *dev, uint8_t reg, uint8_t mask, uint8_t value)
+{
+    return i2c_reg_update_byte_dt(dev, reg, mask, value, mask);
+}
+
 /*
 * @brief Reads and parses bits from STAT0 reg
 *
@@ -142,10 +147,26 @@ static int bq25188_fetch_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188
     if (error < 0) {
         return error;
     }
-    // finish later
-    // vbat_ctrl->pg_mode = 
+
+    // pg_mode (bit 7) is reserved - IGNORE -
+    vbat_ctrl->vbatreg = (vbat_ctrl_bits & (~BIT(7)));
     return 0;
-} 
+}
+
+static int bq25188_set_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188_vbat_ctrl *vbat_ctrl) {
+    int error;
+    uint8_t vbat_ctrl_bits = 0;
+
+    vbat_ctrl_bits |= vbat_ctrl->vbatreg;
+    return bq25188_update_bits(dev, BQ25188_VBAT_CTRL, ~BIT(7), vbat_ctrl_bits);
+}
+
+/*
+// Back up function if update bits doesn't work
+static int bq25188_set_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188_vbat_ctrl *vbat_ctrl) {
+    return bq25188_write(dev, BQ25180_VBAT_CTRL, vbat_ctrl->vbatreg);
+}
+*/
 
 static int bq25188_fetch_ichg_ctrl(const struct i2c_dt_spec *dev, struct bq25188_ichg_ctrl *ichg_ctrl) {
     int error;

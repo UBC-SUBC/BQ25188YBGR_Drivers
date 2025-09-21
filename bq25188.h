@@ -66,7 +66,6 @@ struct bq25188_flag0 {
 }
 
 struct bq25188_vbat_ctrl {
-    uint8_t pg mode;  // reserved
     uint8_t vbatreg;
 };
 
