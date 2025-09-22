@@ -2,7 +2,7 @@
 * BQ25188YBGR Battery Charger Driver
 * 
 * Author: Thomas McGrath
-* Edited: 2025.09.10
+* Edited: 2025.09.21
 * Reference PCB: Battery_Pack_1A
 * PCB Author: Rosemary Rosemary
 */
