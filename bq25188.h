@@ -256,11 +256,12 @@ struct bq25188_ts_control {
     uint8_t ts_vrcg;
 };
 
-struct bq25188_msk_id {
+struct bq25188_mask_id {
     uint8_t ts_int_mask;
     uint8_t treg_int_mask;
     uint8_t bat_int_mask;
     uint8_t pg_int_mask;
+    uint8_t device_id;
 };
 
 /* ----- End of Internal Regs ----- */

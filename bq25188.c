@@ -340,3 +340,96 @@ static int bq25188_set_ship_rst(const struct i2c_dt_spec *dev, struct bq25188_sh
     return bq25188_write(dev, BQ25188_SHIP_RST, ship_rst_bits);
 }
 
+static int bq25188_fetch_sys_reg(const struct i2c_dt_spec *dev, struct bq25188_sys_reg *sys_reg) {
+    int error;
+    uint8_t sys_reg_bits;
+
+    error = bq25188_read(dev, BQ25188_SYS_REG, &sys_reg_bits);
+    if (error < 0) {
+        return error;
+    }
+
+    sys_reg->sys_reg_ctrl        = (sys_reg_bits & (BIT(7) | BIT(6) | BIT(5))) >> 5;
+    sys_reg->pg_gpo              = (sys_reg_bits & BIT(4)) >> 4;
+    sys_reg->sys_mode            = (sys_reg_bits & (BIT(3) | BIT(2))) >> 2;
+    sys_reg->watchdog_15s_enable = (sys_reg_bits & BIT(1)) >> 1;
+    sys_reg->vdppm_dis           = (sys_reg_bits & BIT(0));
+
+    return 0;
+}
+
+static int bq25188_set_sys_reg(const struct i2c_dt_spec *dev, struct bq25188_sys_reg *sys_reg) {
+    uint8_t sys_reg_bits = 0;
+
+    sys_reg_bits |= (sys_reg->sys_reg_ctrl << 5);
+    // pg_gpo (bit 4) is reserved
+    sys_reg_bits |= (sys_reg->sys_mode << 2);
+    sys_reg_bits |= (sys_reg->watchdog_15s_enable << 1);
+    sys_reg_bits |= (sys_reg->vdppm_dis);
+
+    return bq25188_update_bits(dev, BQ25188_SYS_REG, ~BIT(4), sys_reg_bits);
+}
+
+static int bq25188_fetch_ts_control(const struct i2c_dt_spec *dev, struct bq25188_ts_control *ts_control) {
+    int error;
+    uint8_t ts_control_bits;
+
+    error = bq25188_read(dev, BQ25188_TS_CONTROL, &ts_control_bits);
+    if (error < 0) {
+        return error;
+    }
+
+    ts_control->ts_hot  = (ts_control_bits & (BIT(7) | BIT(6))) >> 6;
+    ts_control->ts_cold = (ts_control_bits & (BIT(5) | BIT(4))) >> 4;
+    ts_control->ts_warm = (ts_control_bits & BIT(3)) >> 3;
+    ts_control->ts_cool = (ts_control_bits & BIT(2)) >> 2;
+    ts_control->ts_ichg = (ts_control_bits & BIT(1)) >> 1;
+    ts_control->ts_vrcg = (ts_control_bits & BIT(0));
+    
+    return 0;
+}
+
+static int bq25188_set_ts_control(const struct i2c_dt_spec *dev, struct bq25188_ts_control *ts_control){
+    uint8_t ts_control_bits;
+
+    ts_control_bits |= (ts_control->ts_hot << 6);
+    ts_control_bits |= (ts_control->ts_cold << 4);
+    ts_control_bits |= (ts_control->ts_warm << 3);
+    ts_control_bits |= (ts_control->ts_cool << 2);
+    ts_control_bits |= (ts_control->ts_ichg << 1);
+    ts_control_bits |= (ts_control->ts_vrcg);
+
+    return bq25188_write(dev, BQ25188_TS_CONTROL, ts_control_bits);
+}
+
+static int bq25188_fetch_mask_id(const struct i2c_dt_spec *dev, struct bq25188_mask_id *mask_id) { 
+    int error;
+    uint8_t mask_id_bits;
+
+    error = bq25188_read(dev, BQ25188_MASK_ID, &mask_id_bits);
+    if (error < 0) {
+        return error;
+    }
+
+    mask_id->ts_int_mask = (mask_id_bits & BIT(7)) >> 7;
+    mask_id->treg_int_mask = (mask_id_bits & BIT(6)) >> 6;
+    mask_id->bat_int_mask = (mask_id_bits & BIT(5)) >> 5;
+    mask_id->pg_int_mask = (mask_id_bits & BIT(4)) >> 4;
+    mask_id->device_id = (mask_id_bits & (BIT(3) | BIT(2) | BIT(1) | BIT(0)));
+
+    return 0;
+}
+
+static int bq25188_set_mask_id(const struct i2c_dt_spec *dev, struct bq25188_mask_id *mask_id) {
+    uint8_t mask_id_bits = 0;
+
+    mask_id_bits |= (mask_id->ts_int_mask << 7);
+    mask_id_bits |= (mask_id->treg_int_mask << 6);
+    mask_id_bits |= (mask_id->bat_int_mask << 5);
+    mask_id_bits |= (mask_id->pg_int_mask << 4);
+    // device_id is read only
+
+    return bq25188_update_bits(dev, BQ25188_MASK_ID, ~(BIT(3) | BIT(2) | BIT(1) | BIT(0)), mask_id_bits);
+}
+
+/* ---- End of set and fetch functions for internal regs ----*/
