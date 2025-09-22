@@ -266,11 +266,29 @@ struct bq25188_mask_id {
 
 /* ----- End of Internal Regs ----- */
 
-
+struct bq25188_data {
+    const struct i2c_dt_spec bq25188_i2c;
+    struct bq25188_stat0 stat0;
+    struct bq25188_stat1 stat1;
+    // This structure is used for external functions
+    // you can add flags (wake flags) or usb insertion flags here
+};
 
 // global function delcarations
+/* The Idea of drivers is to make it easier to interact with the sensor.
+    When the mcu first starts you'll do bq25188_init and then have bq25188_fetch_data
+    on an interrupt, work, or timer.
 
+*/
 
+int bq25188_init(struct bq25188_data *data);
+int bq25188_fetch_data(struct bq25188_data *data); // add functionality for this :)
+// Good to addt more functions for fetching general data (ex. voltage and status flags).
+// Good to add function for entering shipmode with and without the button.
+// Essential to setup as the int pin of the chip to point the callback to an interrupt to ...
+// ...submit a bq25188_fetch_data work to know why there was an interrupt triggered.
+
+// explore datasheet or learn more external functions you can add
 
 
 #endif /* INC_BQ25188_H */

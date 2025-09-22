@@ -51,7 +51,7 @@ static inline int bq25188_update_bits(const struct i2c_dt_spec *dev, uint8_t reg
 * @return 0 on success
 * @return negative on fail
 */
-static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25180_stat0 *stat0) {
+static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25188_stat0 *stat0) {
     int error;
     uint8_t stat0_bits;
 
@@ -112,7 +112,7 @@ static int bq25188_fetch_flag0(const struct i2c_dt_spec *dev, struct bq25188_fla
     int error;
     uint8_t flag0_bits;
 
-    error = bq25180_read(dev, BQ25180_FLAG0, &flag0_bits)
+    error = bq25188_read(dev, BQ25188_FLAG0, &flag0_bits)
     if (error <0) {
         return error;
     }
@@ -163,7 +163,7 @@ static int bq25188_set_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188_v
 /*
 // Back up function if update bits doesn't work
 static int bq25188_set_vbat_ctrl(const struct i2c_dt_spec *dev, struct bq25188_vbat_ctrl *vbat_ctrl) {
-    return bq25188_write(dev, BQ25180_VBAT_CTRL, vbat_ctrl->vbatreg);
+    return bq25188_write(dev, BQ25188_VBAT_CTRL, vbat_ctrl->vbatreg);
 }
 */
 
@@ -430,6 +430,68 @@ static int bq25188_set_mask_id(const struct i2c_dt_spec *dev, struct bq25188_mas
     // device_id is read only
 
     return bq25188_update_bits(dev, BQ25188_MASK_ID, ~(BIT(3) | BIT(2) | BIT(1) | BIT(0)), mask_id_bits);
+    // Could use GENMASK(7,4) instead of using BIT macro
 }
 
 /* ---- End of set and fetch functions for internal regs ----*/
+
+int bq25188_init(struct bq25188_data *data){
+    int error;
+    const struct i2c_dt_spec *dev = &(data->bq2188_i2c);
+
+    const struct bq25188_ic_ctrl ic_ctrl = {
+                                            .watchdog_sel = BQ25188_WD_SEL_DISABLE,
+    };
+
+    const struct bq25188_tmr_ilim tmr_ilim = {
+                                              .mr_lpress = BQ25188_MR_LPRESS_5S,
+                                              .mr_reset_vin = 0,
+                                              .ilim = BQ25188_ILIM_1100mA,
+    };
+    const struct bq25188_ship_rst ship_rst = {
+                                              .reg_rst = 0,
+                                              .en_rst_ship = BQ25188_EN_RST_SHIP_DO_NTHNG,       /* enable shipmode from ISR */
+                                              .pb_lpress_action = BQ25188_PB_LPRESS_DO_NTHNG,    /* set to enter shipmode via software ISR */
+                                              .wake1_tmr = 0,                                    /* 300 ms */
+                                              .wake2_tmr = 0,                                    /* 2 s */
+                                              .en_push = 1,                                      /* enable pushbutton for user interaction */
+    };
+    const struct bq25188_sys_reg sys_reg = {
+                                            .sys_reg_ctrl = BQ25188_SYS_REG_CTRL_BATTERY_TRACKING
+                                            .sys_mode = BQ25188_SYS_MODE_VIN_VBAT,
+                                            .watchdog_15s_enable = 0,
+                                            .vdppm_dis = 0,
+    };
+
+    const struct bq25188_ichg_ctrl ichg_ctrl = {
+                                            .chg_dis = 0,                                       /* Battery Charging Enabled */
+                                            .ichg = 52,                                         /* 52 for 250mA */ 
+    };
+
+    error = bq25188_set_ic_ctrl(dev, &ic_ctrl);
+    if (error < 0) {
+        return error;
+    }                                        
+    error = bq25188_set_tmr_ilim(dev, &tmr_ilim);
+    if (error < 0) {
+        return error;
+    }                                        
+
+    error = bq25188_set_ship_rst(dev, &ship_rst);
+    if (error < 0) {
+        return error;
+    }
+    
+    
+    error = bq25188_set_ichg_ctrl(dev, &ichg_ctrl);
+    if (error < 0) {
+        return error;
+    }
+    
+    error =  bq25188_set_sys_reg(dev, &sys_reg);
+    if (error < 0) {
+        return error;
+    }
+
+    return 0;
+}
