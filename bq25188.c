@@ -80,7 +80,7 @@ static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25188_sta
 * @return 0 on success
 * @return negative on fail
 */
-static int bq25188_fetch_stat0(const struct i2c_dt_spec *dev, struct bq25188_stat1 *stat1) {
+static int bq25188_fetch_stat1(const struct i2c_dt_spec *dev, struct bq25188_stat1 *stat1) {
     int error;
     uint8_t stat1_bits;
 
